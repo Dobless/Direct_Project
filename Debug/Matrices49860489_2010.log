@@ -1,0 +1,10 @@
+﻿  Matrices49860489.cpp
+c:\users\jsl\desktop\dobless\학교\컴퓨터 그래픽스\matrices49860489\matrices49860489.cpp(245): warning C4100: 'lpCmdLine': unreferenced formal parameter
+c:\users\jsl\desktop\dobless\학교\컴퓨터 그래픽스\matrices49860489\matrices49860489.cpp(244): warning C4100: 'hPrevInstance': unreferenced formal parameter
+c:\users\jsl\desktop\dobless\학교\컴퓨터 그래픽스\matrices49860489\matrices49860489.cpp(434): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\jsl\desktop\dobless\학교\컴퓨터 그래픽스\matrices49860489\matrices49860489.cpp(467): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\jsl\desktop\dobless\학교\컴퓨터 그래픽스\matrices49860489\matrices49860489.cpp(493): warning C4456: declaration of 'i' hides previous local declaration
+  c:\users\jsl\desktop\dobless\학교\컴퓨터 그래픽스\matrices49860489\matrices49860489.cpp(474): note: see declaration of 'i'
+c:\users\jsl\desktop\dobless\학교\컴퓨터 그래픽스\matrices49860489\matrices49860489.cpp(497): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  Matrices49860489_2010.vcxproj -> C:\Users\JSL\Desktop\Dobless\학교\컴퓨터 그래픽스\Matrices49860489\Debug\Matrices49860489.exe
+  Matrices49860489_2010.vcxproj -> C:\Users\JSL\Desktop\Dobless\학교\컴퓨터 그래픽스\Matrices49860489\Debug\Matrices49860489.pdb (Full PDB)
