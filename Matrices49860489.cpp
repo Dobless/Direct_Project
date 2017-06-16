@@ -181,7 +181,6 @@ bool Bullet::check_collision(float x, float y)
 	{
 		bShow = false;
 		return true;
-
 	}
 	else {
 
@@ -483,33 +482,22 @@ void do_game_logic(void)
 		}
 		if (bullet[i].show() == true)
 		{
-		if (bullet[i].y_pos < -70)
-			bullet[i].hide();
-		else
-			bullet[i].move();
+			if (bullet[i].y_pos < -70) bullet[i].hide();
+			else bullet[i].move();
 
-
-		//面倒 贸府 
-		for (int i = 0; i<BULLET_NUM; i++)
-		{
-			if (bullet[i].check_collision(enemy[i].x_pos, enemy[i].y_pos) == true)
+			//面倒 贸府 
+			for (int i = 0; i < BULLET_NUM; i++)
 			{
-				enemy[i].init((float)(rand() % 300), rand() % 200 - 300);
-
+				if (bullet[i].check_collision(enemy[i].x_pos, enemy[i].y_pos) == true)
+				{
+					for (int i = 0; i < ENEMY_NUM; i++)
+					{
+						enemy[i].init((float)(rand() % 300), rand() % 200 - 300);
+					}
+				}
 			}
 		}
-
-
-
 	}
-	}
-	
-
-
-	
-
-
-
 }
 
 // this is the function used to render a single frame
