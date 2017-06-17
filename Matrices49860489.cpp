@@ -5,6 +5,12 @@
 #include <d3dx9.h>
 #include <iostream>
 
+// 음악 관련
+#include <mmsystem.h>
+#include <strmif.h>
+#include <control.h>
+#include <uuids.h>
+
 // define the screen resolution and keyboard macros
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 380
@@ -18,6 +24,9 @@
 // include the Direct3D Library file
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
+
+// 음악 관련
+#pragma comment(lib, "strmiids.lib")
 
 // global declarations
 LPDIRECT3D9 d3d;    // the pointer to our Direct3D interface
@@ -226,7 +235,262 @@ void Bullet::hide()
 
 }
 
+// 음악 관련
+class Mp3
+{
+public:
+	Mp3();
+	~Mp3();
 
+	bool Load(LPCWSTR filename);
+	void Cleanup();
+
+	bool Play();
+	bool Pause();
+	bool Stop();
+
+	// msTirmeout이 0이되면 즉시반환
+	// mp3가 끝나면 true 반환
+	bool WaitForCompletion(long msTimeout, long *EvCode);
+
+	// 볼륨 조절
+	bool SetVolume(long vol);
+	long GetVolume();
+
+	// 1억분의 1초단위로 시간 반환
+	// 10,000,000 == 1초
+	// 결과를 1억으로 나눔
+	// 초단위의 지속시간
+	__int64 GetDuration();
+
+	// 현재 재생 위치 반환
+	__int64 GetCurrentPosition();
+
+	//
+	bool SetPositions(__int64* pCurrent, __int64* pStop, bool bAbsolutePositioning);
+
+private:
+	IGraphBuilder *  pigb;
+	IMediaControl *  pimc;
+	IMediaEventEx *  pimex;
+	IBasicAudio * piba;
+	IMediaSeeking * pims;
+	bool ready;
+
+	// mp3의 지속시간
+	__int64 duration;
+};
+
+Mp3::Mp3()
+{
+	pigb = NULL;
+	pimc = NULL;
+	pimex = NULL;
+	piba = NULL;
+	pims = NULL;
+	ready = false;
+	duration = 0;
+}
+
+Mp3::~Mp3()
+{
+	Cleanup();
+}
+
+void Mp3::Cleanup()
+{
+	if (pimc) pimc->Stop();
+	
+	if (pigb)
+	{
+		pigb->Release();
+		pigb = NULL;
+	}
+
+	if (pimc)
+	{
+		pimc->Release();
+		pimc = NULL;
+	}
+
+	if (pimex)
+	{
+		pimex->Release();
+		pimex = NULL;
+	}
+
+	if (piba)
+	{
+		piba->Release();
+		piba = NULL;
+	}
+
+	if (pims)
+	{
+		pims->Release();
+		pims = NULL;
+	}
+
+	ready = false;
+}
+
+bool Mp3::Load(LPCWSTR szFile)
+{
+	Cleanup();
+	ready = false;
+
+	if (SUCCEEDED(CoCreateInstance(CLSID_FilterGraph,
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		IID_IGraphBuilder,
+		(void **)&this->pigb)))
+	{
+		pigb->QueryInterface(IID_IMediaControl, (void **)&pimc);
+		pigb->QueryInterface(IID_IMediaEventEx, (void **)&pimex);
+		pigb->QueryInterface(IID_IBasicAudio, (void**)&piba);
+		pigb->QueryInterface(IID_IMediaSeeking, (void**)&pims);
+
+		HRESULT hr = pigb->RenderFile(szFile, NULL);
+		if (SUCCEEDED(hr))
+		{
+			ready = true;
+			if (pims)
+			{
+				pims->SetTimeFormat(&TIME_FORMAT_MEDIA_TIME);
+				pims->GetDuration(&duration); // returns 10,000,000 for a second.
+				duration = duration;
+			}
+		}
+	}
+
+	return ready;
+}
+
+bool Mp3::Pause()
+{
+	if (ready&&pimc)
+	{
+		HRESULT hr = pimc->Pause();
+		return SUCCEEDED(hr);
+	}
+
+	return false;
+}
+
+bool Mp3::Stop()
+{
+	if (ready&&pimc)
+	{
+		HRESULT hr = pimc->Stop();
+		return SUCCEEDED(hr);
+	}
+
+	return false;
+}
+
+bool Mp3::WaitForCompletion(long msTimeout, long* EvCode)
+{
+	if (ready&&pimex)
+	{
+		HRESULT hr = pimex->WaitForCompletion(msTimeout, EvCode);
+		return *EvCode > 0;
+	}
+
+	return false;
+}
+
+bool Mp3::SetVolume(long vol)
+{
+	if (ready&&piba)
+	{
+		HRESULT hr = piba->put_Volume(vol);
+		return SUCCEEDED(hr);
+	}
+
+	return false;
+}
+
+long Mp3::GetVolume()
+{
+	if (ready&&piba)
+	{
+		long vol = -1;
+		HRESULT hr = piba->get_Volume(&vol);
+
+		if (SUCCEEDED(hr))
+			return vol;
+	}
+
+	return -1;
+}
+
+__int64 Mp3::GetDuration()
+{
+	return duration;
+}
+
+__int64 Mp3::GetCurrentPosition()
+{
+	if (ready&&pims)
+	{
+		__int64 curpos = -1;
+		HRESULT hr = pims->GetCurrentPosition(&curpos);
+
+		if (SUCCEEDED(hr))
+			return curpos;
+	}
+
+	return -1;
+}
+
+bool Mp3::SetPositions(__int64* pCurrent, __int64* pStop, bool bAbsolutePositioning)
+{
+	if (ready&&pims)
+	{
+		DWORD flags = 0;
+		if (bAbsolutePositioning)
+			flags = AM_SEEKING_AbsolutePositioning | AM_SEEKING_SeekToKeyFrame;
+		else
+			flags = AM_SEEKING_RelativePositioning | AM_SEEKING_SeekToKeyFrame;
+
+		HRESULT hr = pims->SetPositions(pCurrent, flags, pStop, flags);
+
+		if (SUCCEEDED(hr))
+			return true;
+	}
+
+	return false;
+}
+
+class CLibMP3DLL
+{
+public:
+	CLibMP3DLL(void);
+	~CLibMP3DLL(void);
+
+	bool LoadDLL(LPCWSTR dll);
+	void UnloadDLL();
+
+	bool Load(LPCWSTR filename);
+	bool Cleanup();
+
+	bool Play();
+	bool Pause();
+	bool Stop();
+	bool WaitForCompletion(long msTimeout, long* EvCode);
+
+	bool SetVolume(long vol);
+	long GetVolume();
+
+	__int64 GetDuration();
+	__int64 GetCurrentPosition();
+
+	bool SetPositions(__int64* pCurrent, __int64* pStop, bool bAbsolutePositioning);
+
+
+private:
+	HMODULE m_Mod;
+};
 
 
 
@@ -235,8 +499,6 @@ void Bullet::hide()
 Hero hero;
 Enemy enemy[ENEMY_NUM];
 Bullet bullet[BULLET_NUM];
-
-
 
 // the entry point for any Windows program
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -314,11 +576,11 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 {
 	switch (message)
 	{
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		return 0;
-	} break;
+		case WM_DESTROY:
+		{
+			PostQuitMessage(0);
+			return 0;
+		} break;
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
@@ -339,7 +601,6 @@ void initD3D(HWND hWnd)
 	d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
 	d3dpp.BackBufferWidth = SCREEN_WIDTH;
 	d3dpp.BackBufferHeight = SCREEN_HEIGHT;
-
 
 	// create a device class using this information and the info from the d3dpp stuct
 	d3d->CreateDevice(D3DADAPTER_DEFAULT,
@@ -365,7 +626,6 @@ void initD3D(HWND hWnd)
 		NULL,    // no image info struct
 		NULL,    // not using 256 colors
 		&sprite);    // load to sprite
-
 
 	D3DXCreateTextureFromFileEx(d3ddev,    // the device pointer
 		L"hero.png",    // the file name
@@ -397,7 +657,6 @@ void initD3D(HWND hWnd)
 		NULL,    // not using 256 colors
 		&sprite_enemy);    // load to sprite
 
-
 	D3DXCreateTextureFromFileEx(d3ddev,    // the device pointer
 		L"bullet.png",    // the file name
 		D3DX_DEFAULT,    // default width
@@ -413,10 +672,6 @@ void initD3D(HWND hWnd)
 		NULL,    // not using 256 colors
 		&sprite_bullet);    // load to sprite
 
-
-
-
-
 	return;
 }
 
@@ -429,7 +684,6 @@ void init_game(void)
 	//적들 초기화 
 	for (int i = 0; i<ENEMY_NUM; i++)
 	{
-
 		enemy[i].init((float)(rand() % 300), rand() % 200 - 300);
 	}
 
@@ -557,7 +811,6 @@ void render_frame(void)
 
 	for (int i = 0; i<ENEMY_NUM; i++)
 	{
-
 		D3DXVECTOR3 position2(enemy[i].x_pos, enemy[i].y_pos, 0.0f);    // position at 50, 50 with no depth
 		d3dspt->Draw(sprite_enemy, &part2, &center2, &position2, D3DCOLOR_ARGB(255, 255, 255, 255));
 	}

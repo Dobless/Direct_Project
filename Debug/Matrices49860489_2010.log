@@ -1,12 +1,14 @@
 ﻿  Matrices49860489.cpp
-e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(244): warning C4100: 'lpCmdLine': unreferenced formal parameter
-e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(243): warning C4100: 'hPrevInstance': unreferenced formal parameter
-e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(433): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(466): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(489): warning C4456: declaration of 'i' hides previous local declaration
-  e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(473): note: see declaration of 'i'
-e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(493): warning C4456: declaration of 'i' hides previous local declaration
-  e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(489): note: see declaration of 'i'
-e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(495): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(393): warning C4189: 'hr': local variable is initialized but not referenced
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(505): warning C4100: 'lpCmdLine': unreferenced formal parameter
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(504): warning C4100: 'hPrevInstance': unreferenced formal parameter
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(694): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(727): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(750): warning C4456: declaration of 'i' hides previous local declaration
+  e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(734): note: see declaration of 'i'
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(754): warning C4456: declaration of 'i' hides previous local declaration
+  e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(750): note: see declaration of 'i'
+e:\학교\컴퓨터 그래픽스\direct game\matrices49860489.cpp(756): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Matrices49860489.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
   Matrices49860489_2010.vcxproj -> E:\학교\컴퓨터 그래픽스\Direct game\Debug\Matrices49860489.exe
   Matrices49860489_2010.vcxproj -> E:\학교\컴퓨터 그래픽스\Direct game\Debug\Matrices49860489.pdb (Full PDB)
