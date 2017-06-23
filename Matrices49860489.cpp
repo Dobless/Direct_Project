@@ -98,6 +98,12 @@ LPDIRECT3DTEXTURE9 go_screen;
 LPDIRECT3DTEXTURE9 text_back;;
 
 LPDIRECT3DTEXTURE9 c_screen;
+LPDIRECT3DTEXTURE9 sb;
+LPDIRECT3DTEXTURE9 max_combo1;
+LPDIRECT3DTEXTURE9 max_combo10;
+LPDIRECT3DTEXTURE9 class_A;
+LPDIRECT3DTEXTURE9 class_B;
+LPDIRECT3DTEXTURE9 class_C;
 
 
 
@@ -118,6 +124,14 @@ MCI_OPEN_PARMS igbgmopen;
 MCI_PLAY_PARMS igbgmplay;
 int igbgmID;
 
+MCI_OPEN_PARMS cbgmopen;
+MCI_PLAY_PARMS cbgmplay;
+int cbgmID;
+
+MCI_OPEN_PARMS gobgmopen;
+MCI_PLAY_PARMS gobgmplay;
+int gobgmID;
+
 DWORD hTime;
 DWORD hNow;
 DWORD eTime;
@@ -132,6 +146,7 @@ int ueCount[ENEMY_NOTE];
 int reCount[ENEMY_NOTE];
 
 int igCombo;
+int maxCombo;
 int igHit;
 int igHeart;
 
@@ -139,6 +154,7 @@ float main_x;
 float ingame_x;
 
 float goal_position;
+float sb_position;
 
 void Main_position()
 {
@@ -797,6 +813,20 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	igbgmID = igbgmopen.wDeviceID;
 
+	cbgmopen.lpstrElementName = L"Clear_bgm.mp3";
+	cbgmopen.lpstrDeviceType = L"MPEGVideo";
+
+	mciSendCommand(cbgmID, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD)(LPVOID)&cbgmopen);
+
+	cbgmID = cbgmopen.wDeviceID;
+
+	gobgmopen.lpstrElementName = L"Game_over_bgm.mp3";
+	gobgmopen.lpstrDeviceType = L"MPEGVideo";
+
+	mciSendCommand(gobgmID, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD)(LPVOID)&gobgmopen);
+
+	gobgmID = gobgmopen.wDeviceID;
+
 	mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mbgmplay);
 
 	while (TRUE)
@@ -832,6 +862,174 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	return msg.wParam;
 }
 
+void Ig_reset()
+{
+	igCombo = 0;
+	igHeart = 20;
+	maxCombo = 0;
+	igHit = 0;
+
+	goal_position = 13000.0f;
+	sb_position = 1600.0f;
+
+	//객체 초기화
+	lk.init(278, 970);
+	lk.bEffcet = true;
+
+	uk.init(410, 970);
+	uk.bEffect = true;
+
+	rk.init(540, 970);
+	rk.bEffect = true;
+
+	main_x = 0.0f;
+
+	lkone = true;
+	ukone = true;
+	rkone = true;
+
+	float le_pos = 120.0f;
+	float ue_pos = 220.0f;
+	float re_pos = 320.0f;
+
+	//적들 초기화 
+	//for (int i = 0; i<ENEMY_NUM; i++)
+	//{
+	//	enemy[i].init(2000, (float)(rand() % 300));
+	//	enemy[i].effect(enemy[i].x_pos, enemy[i].y_pos);
+	//}
+
+	float ep = 8882000;
+
+	for (int i = 0; i < ENEMY_NOTE; i++)
+	{
+		le[i].init(ep, 120);
+		le[i].bShow = true;
+		le[i].bMove = true;
+
+		ue[i].init(ep, 220);
+		ue[i].bShow = true;
+		ue[i].bMove = true;
+
+		re[i].init(ep, 320);
+		re[i].bShow = true;
+		re[i].bMove = true;
+
+		ep += 300;
+	}
+
+	le[0].init(2580, le_pos);
+	ue[0].init(2830, ue_pos);
+	le[1].init(3000, le_pos);
+	re[0].init(3230, re_pos);
+
+	le[2].init(3200, le_pos);
+	ue[1].init(3480, ue_pos);
+	le[3].init(3650, le_pos);
+	re[1].init(3880, re_pos);
+
+	le[4].init(3830, le_pos);
+	ue[2].init(4080, ue_pos);
+	le[5].init(4250, le_pos);
+	re[2].init(4480, re_pos);
+
+	le[6].init(4500, le_pos);
+	le[7].init(4600, le_pos);
+	ue[3].init(4780, ue_pos);
+	le[8].init(4700, le_pos);
+	le[9].init(4900, le_pos);
+	re[3].init(5080, re_pos);
+
+	le[10].init(5070, le_pos);
+	ue[4].init(5350, ue_pos);
+	le[11].init(5520, le_pos);
+	re[4].init(5750, re_pos);
+
+	le[12].init(5750, le_pos);
+	ue[5].init(6000, ue_pos);
+	le[13].init(6170, le_pos);
+	re[5].init(6400, re_pos);
+
+	le[14].init(6350, le_pos);
+	ue[6].init(6600, ue_pos);
+	le[15].init(6770, le_pos);
+	re[6].init(7000, re_pos);
+
+	le[16].init(7020, le_pos);
+	le[17].init(7120, le_pos);
+	ue[7].init(7270, ue_pos);
+	ue[8].init(7370, ue_pos);
+	re[7].init(7520, re_pos);
+	re[8].init(7620, re_pos);
+	le[18].init(7460, le_pos);
+	ue[9].init(7580, ue_pos);
+	re[9].init(7700, re_pos);
+
+	le[19].init(7650, le_pos);
+	ue[10].init(7800, ue_pos);
+	re[10].init(7950, re_pos);
+	le[20].init(8010, le_pos);
+	re[11].init(8300, re_pos);
+
+	le[21].init(8300, le_pos);
+	ue[11].init(8450, ue_pos);
+	re[12].init(8600, re_pos);
+	le[22].init(8660, le_pos);
+	re[13].init(8950, re_pos);
+
+	ue[12].init(9000, ue_pos);
+
+	le[23].init(9200, le_pos);
+	ue[13].init(9350, ue_pos);
+	re[14].init(9500, re_pos);
+	le[24].init(9400, le_pos);
+	ue[14].init(9550, ue_pos);
+	re[15].init(9700, re_pos);
+
+	re[16].init(10300, re_pos);
+	ue[15].init(10300, ue_pos);
+	le[25].init(10300, le_pos);
+	re[17].init(10650, re_pos);
+	le[26].init(10550, le_pos);
+
+	re[18].init(10300 + 650, re_pos);
+	ue[16].init(10300 + 650, ue_pos);
+	le[27].init(10300 + 650, le_pos);
+	re[19].init(10650 + 650, re_pos);
+	le[28].init(10550 + 650, le_pos);
+
+	ue[17].init(10300 + 650 + 500, ue_pos);
+
+	le[29].init(10300 + 650 + 500 + 400, le_pos);
+	ue[18].init(10300 + 650 + 500 + 400, ue_pos);
+	re[20].init(10300 + 650 + 500 + 400, re_pos);
+	le[30].init(10300 + 650 + 500 + 600, le_pos);
+	ue[19].init(10300 + 650 + 500 + 600, ue_pos);
+	re[21].init(10300 + 650 + 500 + 600, re_pos);
+
+	for (int i = 0; i < NOTE; i++)
+	{
+		ln[i].bMove = true;
+		un[i].bMove = true;
+		rn[i].bMove = true;
+	}
+
+	//총알 초기화 
+	for (int i = 0; i<NOTE; i++)
+	{
+		ln[i].init(lk.x_pos, lk.y_pos);
+	}
+
+	for (int i = 0; i<NOTE; i++)
+	{
+		un[i].init(uk.x_pos, uk.y_pos);
+	}
+
+	for (int i = 0; i<NOTE; i++)
+	{
+		rn[i].init(rk.x_pos, rk.y_pos);
+	}
+}
 
 // this is the main message handler for the program
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -843,6 +1041,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	{
 	case WM_LBUTTONUP:
 	{
+		x = LOWORD(lParam);
+		y = HIWORD(lParam);
 		if (mScreen)
 		{
 			sScreen = true;
@@ -852,34 +1052,57 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		}
 		if (sScreen)
 		{
-			mciSendCommand(1, MCI_STOP, 0, (DWORD)(LPVOID)&mbgmplay);
-			mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mbgmplay);
-			mciSendCommand(2, MCI_PLAY, 0, (DWORD)(LPVOID)&igbgmplay);
+			if (x >= 100 && y >= 400)
+			{
+				if (x <= 900 && y <= 600)
+				{
+					mciSendCommand(1, MCI_STOP, 0, (DWORD)(LPVOID)&mbgmplay);
+					mciSendCommand(1, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mbgmplay);
+					mciSendCommand(2, MCI_PLAY, 0, (DWORD)(LPVOID)&igbgmplay);
+					mnA = 0;
 
-			mnA = 0;
-
-			igScreen = true;
-			sScreen = false;
+					igScreen = true;
+					sScreen = false;
+				}
+			}
 			break;
 		}
 		if (cScreen)
 		{
-			mciSendCommand(1, MCI_PLAY, 0, (DWORD)(LPVOID)&mbgmplay);
-			
-			mnA = 0;
-			
-			mScreen = true;
-			cScreen = false;
+			if (x >= 1000 && y >= 1030)
+			{
+				if (x <= 1450 && y <= 1180)
+				{
+					Ig_reset();
+					mciSendCommand(1, MCI_PLAY, 0, (DWORD)(LPVOID)&mbgmplay);
+
+					mciSendCommand(3, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&cbgmplay);
+					
+					mnA = 0;
+					
+					mScreen = true;
+					cScreen = false;
+				}
+			}
 			break;
 		}
 		if (goScreen)
 		{
-			mciSendCommand(1, MCI_PLAY, 0, (DWORD)(LPVOID)&mbgmplay);
-			
-			mnA = 0;
-			
-			mScreen = true;
-			goScreen = false;
+			if (x >= 1000 && y >= 1030)
+			{
+				if (x <= 1450 && y <= 1180)
+				{
+					Ig_reset();
+					mciSendCommand(1, MCI_PLAY, 0, (DWORD)(LPVOID)&mbgmplay);
+
+					mciSendCommand(4, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&gobgmplay);
+
+					mnA = 0;
+
+					mScreen = true;
+					goScreen = false;
+				}
+			}
 			break;
 		}
 		return 0;
@@ -1454,8 +1677,8 @@ void initD3D(HWND hWnd)
 
 	D3DXCreateTextureFromFileEx(d3ddev,    // the device pointer
 		L"Mamamoo.png",    // the file name
-		300,    // default width
-		300,    // default height
+		400,    // default width
+		400,    // default height
 		D3DX_DEFAULT,    // no mip mapping
 		NULL,    // regular usage
 		D3DFMT_A8R8G8B8,    // 32-bit pixels with alpha
@@ -1511,175 +1734,70 @@ void initD3D(HWND hWnd)
 		NULL,    // no image info struct
 		NULL,    // not using 256 colors
 		&c_screen);    // load to sprite
+
+	D3DXCreateTextureFromFileEx(d3ddev,    // the device pointer
+		L"score_board.png",    // the file name
+		500,    // default width
+		650,    // default height
+		D3DX_DEFAULT,    // no mip mapping
+		NULL,    // regular usage
+		D3DFMT_A8R8G8B8,    // 32-bit pixels with alpha
+		D3DPOOL_MANAGED,    // typical memory handling
+		D3DX_DEFAULT,    // no filtering
+		D3DX_DEFAULT,    // no mip filtering
+		D3DCOLOR_XRGB(255, 0, 255),    // the hot-pink color key
+		NULL,    // no image info struct
+		NULL,    // not using 256 colors
+		&sb);    // load to sprite
+
+	D3DXCreateTextureFromFileEx(d3ddev,    // the device pointer
+		L"A_class.png",    // the file name
+		200,    // default width
+		200,    // default height
+		D3DX_DEFAULT,    // no mip mapping
+		NULL,    // regular usage
+		D3DFMT_A8R8G8B8,    // 32-bit pixels with alpha
+		D3DPOOL_MANAGED,    // typical memory handling
+		D3DX_DEFAULT,    // no filtering
+		D3DX_DEFAULT,    // no mip filtering
+		D3DCOLOR_XRGB(255, 0, 255),    // the hot-pink color key
+		NULL,    // no image info struct
+		NULL,    // not using 256 colors
+		&class_A);    // load to sprite
+
+	D3DXCreateTextureFromFileEx(d3ddev,    // the device pointer
+		L"B_class.png",    // the file name
+		200,    // default width
+		200,    // default height
+		D3DX_DEFAULT,    // no mip mapping
+		NULL,    // regular usage
+		D3DFMT_A8R8G8B8,    // 32-bit pixels with alpha
+		D3DPOOL_MANAGED,    // typical memory handling
+		D3DX_DEFAULT,    // no filtering
+		D3DX_DEFAULT,    // no mip filtering
+		D3DCOLOR_XRGB(255, 0, 255),    // the hot-pink color key
+		NULL,    // no image info struct
+		NULL,    // not using 256 colors
+		&class_B);    // load to sprite
+
+	D3DXCreateTextureFromFileEx(d3ddev,    // the device pointer
+		L"C_class.png",    // the file name
+		200,    // default width
+		200,    // default height
+		D3DX_DEFAULT,    // no mip mapping
+		NULL,    // regular usage
+		D3DFMT_A8R8G8B8,    // 32-bit pixels with alpha
+		D3DPOOL_MANAGED,    // typical memory handling
+		D3DX_DEFAULT,    // no filtering
+		D3DX_DEFAULT,    // no mip filtering
+		D3DCOLOR_XRGB(255, 0, 255),    // the hot-pink color key
+		NULL,    // no image info struct
+		NULL,    // not using 256 colors
+		&class_C);    // load to sprite
 	return;
 }
 
-void Ig_reset()
-{
-	igCombo = 0;
-	igHit = 0;
-	igHeart = 20;
 
-	goal_position = 13000.0f;
-
-	//객체 초기화
-	lk.init(278, 970);
-	lk.bEffcet = true;
-
-	uk.init(410, 970);
-	uk.bEffect = true;
-
-	rk.init(540, 970);
-	rk.bEffect = true;
-
-	main_x = 0.0f;
-
-	lkone = true;
-	ukone = true;
-	rkone = true;
-
-	float le_pos = 120.0f;
-	float ue_pos = 220.0f;
-	float re_pos = 320.0f;
-
-	//적들 초기화 
-	//for (int i = 0; i<ENEMY_NUM; i++)
-	//{
-	//	enemy[i].init(2000, (float)(rand() % 300));
-	//	enemy[i].effect(enemy[i].x_pos, enemy[i].y_pos);
-	//}
-
-	float ep = 8882000;
-
-	for (int i = 0; i < ENEMY_NOTE; i++)
-	{
-		le[i].init(ep, 120);
-		le[i].bShow = true;
-		le[i].bMove = true;
-
-		ue[i].init(ep, 220);
-		ue[i].bShow = true;
-		ue[i].bMove = true;
-
-		re[i].init(ep, 320);
-		re[i].bShow = true;
-		re[i].bMove = true;
-
-		ep += 300;
-	}
-
-	le[0].init(2580, le_pos);
-	ue[0].init(2830, ue_pos);
-	le[1].init(3000, le_pos);
-	re[0].init(3230, re_pos);
-
-	le[2].init(3200, le_pos);
-	ue[1].init(3480, ue_pos);
-	le[3].init(3650, le_pos);
-	re[1].init(3880, re_pos);
-
-	le[4].init(3830, le_pos);
-	ue[2].init(4080, ue_pos);
-	le[5].init(4250, le_pos);
-	re[2].init(4480, re_pos);
-
-	le[6].init(4500, le_pos);
-	le[7].init(4600, le_pos);
-	ue[3].init(4780, ue_pos);
-	le[8].init(4700, le_pos);
-	le[9].init(4900, le_pos);
-	re[3].init(5080, re_pos);
-
-	le[10].init(5070, le_pos);
-	ue[4].init(5350, ue_pos);
-	le[11].init(5520, le_pos);
-	re[4].init(5750, re_pos);
-
-	le[12].init(5750, le_pos);
-	ue[5].init(6000, ue_pos);
-	le[13].init(6170, le_pos);
-	re[5].init(6400, re_pos);
-
-	le[14].init(6350, le_pos);
-	ue[6].init(6600, ue_pos);
-	le[15].init(6770, le_pos);
-	re[6].init(7000, re_pos);
-
-	le[16].init(7020, le_pos);
-	le[17].init(7120, le_pos);
-	ue[7].init(7270, ue_pos);
-	ue[8].init(7370, ue_pos);
-	re[7].init(7520, re_pos);
-	re[8].init(7620, re_pos);
-	le[18].init(7460, le_pos);
-	ue[9].init(7580, ue_pos);
-	re[9].init(7700, re_pos);
-
-	le[19].init(7650, le_pos);
-	ue[10].init(7800, ue_pos);
-	re[10].init(7950, re_pos);
-	le[20].init(8010, le_pos);
-	re[11].init(8300, re_pos);
-
-	le[21].init(8300, le_pos);
-	ue[11].init(8450, ue_pos);
-	re[12].init(8600, re_pos);
-	le[22].init(8660, le_pos);
-	re[13].init(8950, re_pos);
-
-	ue[12].init(9000, ue_pos);
-
-	le[23].init(9200, le_pos);
-	ue[13].init(9350, ue_pos);
-	re[14].init(9500, re_pos);
-	le[24].init(9400, le_pos);
-	ue[14].init(9550, ue_pos);
-	re[15].init(9700, re_pos);
-
-	re[16].init(10300, re_pos);
-	ue[15].init(10300, ue_pos);
-	le[25].init(10300, le_pos);
-	re[17].init(10650, re_pos);
-	le[26].init(10550, le_pos);
-
-	re[18].init(10300 + 650, re_pos);
-	ue[16].init(10300 + 650, ue_pos);
-	le[27].init(10300 + 650, le_pos);
-	re[19].init(10650 + 650, re_pos);
-	le[28].init(10550 + 650, le_pos);
-
-	ue[17].init(10300 + 650 + 500, ue_pos);
-
-	le[29].init(10300 + 650 + 500 + 400, le_pos);
-	ue[18].init(10300 + 650 + 500 + 400, ue_pos);
-	re[20].init(10300 + 650 + 500 + 400, re_pos);
-	le[30].init(10300 + 650 + 500 + 600, le_pos);
-	ue[19].init(10300 + 650 + 500 + 600, ue_pos);
-	re[21].init(10300 + 650 + 500 + 600, re_pos);
-
-	for (int i = 0; i < NOTE; i++)
-	{
-		ln[i].bMove = true;
-		un[i].bMove = true;
-		rn[i].bMove = true;
-	}
-
-	//총알 초기화 
-	for (int i = 0; i<NOTE; i++)
-	{
-		ln[i].init(lk.x_pos, lk.y_pos);
-	}
-
-	for (int i = 0; i<NOTE; i++)
-	{
-		un[i].init(uk.x_pos, uk.y_pos);
-	}
-
-	for (int i = 0; i<NOTE; i++)
-	{
-		rn[i].init(rk.x_pos, rk.y_pos);
-	}
-}
 
 void init_game(void)
 {
@@ -1718,6 +1836,14 @@ void do_game_logic(void)
 			mnA++;
 			mnA++;
 		}
+		if (sb_position > 1050)
+		{
+			sb_position--;
+			sb_position--;
+			sb_position--;
+			sb_position--;
+			sb_position--;
+		}
 	}
 
 	if (igScreen)
@@ -1726,9 +1852,12 @@ void do_game_logic(void)
 
 		if (goal_position == 600)
 		{
-			Ig_reset();
+			//Ig_reset();
 			mciSendCommand(2, MCI_STOP, 0, (DWORD)(LPVOID)&igbgmplay);
-			mciSendCommand(2, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
+			mciSendCommand(2, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&igbgmplay);
+
+			mciSendCommand(3, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&cbgmplay);
+
 			igScreen = false;
 			cScreen = true;
 		}
@@ -1960,6 +2089,90 @@ void do_game_logic(void)
 		{
 			heart_text10 = text_2;
 		}
+
+		//// 1 자리 ////
+		if ((maxCombo % 10) == 0)
+		{
+			max_combo1 = text_0;
+		}
+		if ((maxCombo % 10) == 1)
+		{
+			max_combo1 = text_1;
+		}
+		if ((maxCombo % 10) == 2)
+		{
+			max_combo1 = text_2;
+		}
+		if ((maxCombo % 10) == 3)
+		{
+			max_combo1 = text_3;
+		}
+		if ((maxCombo % 10) == 4)
+		{
+			max_combo1 = text_4;
+		}
+		if ((maxCombo % 10) == 5)
+		{
+			max_combo1 = text_5;
+		}
+		if ((maxCombo % 10) == 6)
+		{
+			max_combo1 = text_6;
+		}
+		if ((maxCombo % 10) == 7)
+		{
+			max_combo1 = text_7;
+		}
+		if ((maxCombo % 10) == 8)
+		{
+			max_combo1 = text_8;
+		}
+		if ((maxCombo % 10) == 9)
+		{
+			max_combo1 = text_9;
+		}
+
+		//// 10 자리 ////
+		if ((maxCombo % 100) >= 0)
+		{
+			if ((maxCombo % 100) < 10) max_combo10 = text_0;
+		}
+		if ((maxCombo % 100) >= 10)
+		{
+			if ((maxCombo % 100) < 20) max_combo10 = text_1;
+		}
+		if ((maxCombo % 100) >= 20)
+		{
+			if ((maxCombo % 100) < 30) max_combo10 = text_2;
+		}
+		if ((maxCombo % 100) >= 30)
+		{
+			if ((maxCombo % 100) < 40) max_combo10 = text_3;
+		}
+		if ((maxCombo % 100) >= 40)
+		{
+			if ((maxCombo % 100) < 50) max_combo10 = text_4;
+		}
+		if ((maxCombo % 100) >= 50)
+		{
+			if ((maxCombo % 100) < 60) max_combo10 = text_5;
+		}
+		if ((maxCombo % 100) >= 60)
+		{
+			if ((maxCombo % 100) < 70) max_combo10 = text_6;
+		}
+		if ((maxCombo % 100) >= 70)
+		{
+			if ((maxCombo % 100) < 80) max_combo10 = text_7;
+		}
+		if ((maxCombo % 100) >= 80)
+		{
+			if ((maxCombo % 100) < 90) max_combo10 = text_8;
+		}
+		if ((maxCombo % 100) >= 90)
+		{
+			if ((maxCombo % 100) < 100) max_combo10 = text_9;
+		}
 		
 
 		/////////////////////////////////////////////////
@@ -2003,9 +2216,11 @@ void do_game_logic(void)
 				Ig_reset();
 				mciSendCommand(2, MCI_STOP, 0, (DWORD)(LPVOID)&igbgmplay);
 				mciSendCommand(2, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)NULL);
+
+				mciSendCommand(4, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&gobgmplay);
+
 				igScreen = false;
 				goScreen = true;
-
 			}
 		}
 
@@ -2106,6 +2321,10 @@ void do_game_logic(void)
 						le[y].bMove = false;
 
 						igCombo++;
+						if (maxCombo < igCombo)
+						{
+							maxCombo = igCombo;
+						}
 						igHit++;
 						break;
 					}
@@ -2138,6 +2357,10 @@ void do_game_logic(void)
 						ue[y].bMove = false;
 
 						igCombo++;
+						if (maxCombo < igCombo)
+						{
+							maxCombo = igCombo;
+						}
 						igHit++;
 						break;
 					}
@@ -2170,6 +2393,10 @@ void do_game_logic(void)
 						re[y].bMove = false;
 
 						igCombo++;
+						if (maxCombo < igCombo)
+						{
+							maxCombo = igCombo;
+						}
 						igHit++;
 						break;
 					}
@@ -2530,9 +2757,9 @@ void render_frame(void)
 			d3dspt->Draw(text_goal, &goal_rect, &goalcenter, &goalposition, D3DCOLOR_ARGB(255, 255, 255, 255));
 
 			RECT image_rect;
-			SetRect(&image_rect, 0, 0, 300, 300);
+			SetRect(&image_rect, 0, 0, 400, 400);
 			D3DXVECTOR3 imagecenter(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
-			D3DXVECTOR3 imageposition(1000, 700, 0.0f);    // position at 50, 50 with no depth
+			D3DXVECTOR3 imageposition(900, 700, 0.0f);    // position at 50, 50 with no depth
 			d3dspt->Draw(mamamoo_image, &image_rect, &imagecenter, &imageposition, D3DCOLOR_ARGB(255, 255, 255, 255));
 		}
 
@@ -2558,12 +2785,79 @@ void render_frame(void)
 			D3DXVECTOR3 ccenter(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
 			D3DXVECTOR3 cposition(0.0f, 0.0f, 0.0f);    // position at 50, 50 with no depth
 			d3dspt->Draw(c_screen, &c_rect, &ccenter, &cposition, D3DCOLOR_ARGB(255, 255, 255, 255));
+			
+			RECT sb_rect;
+			SetRect(&sb_rect, 0, 0, 500, 650);
+			D3DXVECTOR3 sbcenter(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+			D3DXVECTOR3 sbposition(sb_position, 200.0f, 0.0f);    // position at 50, 50 with no depth
+			d3dspt->Draw(sb, &sb_rect, &sbcenter, &sbposition, D3DCOLOR_ARGB(255, 255, 255, 255));
 
 			RECT back_rect;
 			SetRect(&back_rect, 0, 0, 450, 150);
 			D3DXVECTOR3 backcenter(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
 			D3DXVECTOR3 backposition(1000.0f, 1030.0f, 0.0f);    // position at 50, 50 with no depth
 			d3dspt->Draw(text_back, &back_rect, &backcenter, &backposition, D3DCOLOR_ARGB(mnA, 255, 255, 255));
+		
+			if (sb_position == 1050)
+			{
+				RECT hit_rect1;
+				SetRect(&hit_rect1, 0, 0, 80, 100);
+				D3DXVECTOR3 h1center(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+				D3DXVECTOR3 h1position(1300, 380, 0.0f);    // position at 50, 50 with no depth
+				d3dspt->Draw(hit_text1, &hit_rect1, &h1center, &h1position, D3DCOLOR_ARGB(255, 255, 255, 255));
+
+				if (igHit >= 10)
+				{
+					RECT hit_rect10;
+					SetRect(&hit_rect10, 0, 0, 80, 100);
+					D3DXVECTOR3 h10center(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+					D3DXVECTOR3 h10position(1250, 380, 0.0f);    // position at 50, 50 with no depth
+					d3dspt->Draw(hit_text10, &hit_rect10, &h10center, &h10position, D3DCOLOR_ARGB(255, 255, 255, 255));
+				}
+
+				RECT max_rect1;
+				SetRect(&max_rect1, 0, 0, 80, 100);
+				D3DXVECTOR3 max1center(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+				D3DXVECTOR3 max1position(1400, 580, 0.0f);    // position at 50, 50 with no depth
+				d3dspt->Draw(max_combo1, &max_rect1, &max1center, &max1position, D3DCOLOR_ARGB(255, 255, 255, 255));
+
+				if (maxCombo >= 10)
+				{
+					RECT max_rect10;
+					SetRect(&max_rect10, 0, 0, 80, 100);
+					D3DXVECTOR3 max10center(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+					D3DXVECTOR3 max10position(1350, 580, 0.0f);    // position at 50, 50 with no depth
+					d3dspt->Draw(max_combo10, &max_rect10, &max10center, &max10position, D3DCOLOR_ARGB(255, 255, 255, 255));
+				}
+
+				if (maxCombo + igHit >= 110)
+				{
+					RECT A_rect;
+					SetRect(&A_rect, 0, 0, 200, 200);
+					D3DXVECTOR3 Acenter(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+					D3DXVECTOR3 Aposition(1100, 600, 0.0f);    // position at 50, 50 with no depth
+					d3dspt->Draw(class_A, &A_rect, &Acenter, &Aposition, D3DCOLOR_ARGB(255, 255, 255, 255));
+				}
+				if (maxCombo + igHit < 110)
+				{
+					if (maxCombo + igHit >= 80)
+					{
+						RECT B_rect;
+						SetRect(&B_rect, 0, 0, 200, 200);
+						D3DXVECTOR3 Bcenter(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+						D3DXVECTOR3 Bposition(1100, 600, 0.0f);    // position at 50, 50 with no depth
+						d3dspt->Draw(class_B, &B_rect, &Bcenter, &Bposition, D3DCOLOR_ARGB(255, 255, 255, 255));
+					}
+				}
+				if (maxCombo + igHit < 80)
+				{
+					RECT C_rect;
+					SetRect(&C_rect, 0, 0, 200, 200);
+					D3DXVECTOR3 Ccenter(0.0f, 0.0f, 0.0f);    // center at the upper-left corner
+					D3DXVECTOR3 Cposition(1100, 600, 0.0f);    // position at 50, 50 with no depth
+					d3dspt->Draw(class_C, &C_rect, &Ccenter, &Cposition, D3DCOLOR_ARGB(255, 255, 255, 255));
+				}
+			}
 		}
 
 		d3dspt->End();    // end sprite drawing

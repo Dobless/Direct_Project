@@ -1,7 +1,7 @@
 ﻿  Matrices49860489.cpp
-e:\학교\direct_project\matrices49860489.cpp(752): warning C4100: 'lpCmdLine': unreferenced formal parameter
-e:\학교\direct_project\matrices49860489.cpp(751): warning C4100: 'hPrevInstance': unreferenced formal parameter
-e:\학교\direct_project\matrices49860489.cpp(839): warning C4101: 'hdc': unreferenced local variable
-e:\학교\direct_project\matrices49860489.cpp(2273): warning C4101: 'right_rect': unreferenced local variable
+e:\학교\direct_project\matrices49860489.cpp(768): warning C4100: 'lpCmdLine': unreferenced formal parameter
+e:\학교\direct_project\matrices49860489.cpp(767): warning C4100: 'hPrevInstance': unreferenced formal parameter
+e:\학교\direct_project\matrices49860489.cpp(1037): warning C4101: 'hdc': unreferenced local variable
+e:\학교\direct_project\matrices49860489.cpp(2500): warning C4101: 'right_rect': unreferenced local variable
   Matrices49860489_2010.vcxproj -> E:\학교\Direct_Project\Debug\Matrices49860489.exe
   Matrices49860489_2010.vcxproj -> E:\학교\Direct_Project\Debug\Matrices49860489.pdb (Full PDB)
